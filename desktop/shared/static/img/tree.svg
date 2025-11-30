@@ -1,0 +1,105 @@
+<svg width="150" height="1200" viewBox="0 0 600 1200" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+
+    <!-- 1. Bark Pattern Definition -->
+
+    <!-- Matches the CSS background-image data URI and background-size: 60px -->
+
+    <pattern id="barkPattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse" viewBox="0 0 40 40">
+
+       <path d="M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z" fill="#3E2723" fill-opacity="0.4" fill-rule="evenodd"/>
+
+    </pattern>
+
+    
+
+    <!-- 2. Main Trunk Shape for Reuse/Clipping -->
+
+    <rect id="trunkShape" width="600" height="1200" rx="20" />
+
+    
+
+    <!-- 3. Drop Shadow Filter (Matches box-shadow) -->
+
+    <filter id="trunkShadow" x="-20%" y="-10%" width="140%" height="120%">
+
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/> <!-- Blur amount -->
+
+      <feOffset dx="0" dy="20" result="offsetblur"/> <!-- Position -->
+
+      <feComponentTransfer>
+
+        <feFuncA type="linear" slope="0.1"/> <!-- Opacity 0.1 -->
+
+      </feComponentTransfer>
+
+      <feMerge> 
+
+        <feMergeNode/>
+
+        <feMergeNode in="SourceGraphic"/> 
+
+      </feMerge>
+
+    </filter>
+
+  </defs>
+
+
+
+  <!-- Apply Drop Shadow to the whole group -->
+
+  <g filter="url(#trunkShadow)">
+
+      
+
+      <!-- Masking Group to keep shadows/texture inside rounded corners -->
+
+      <g clip-path="url(#trunkClip)">
+
+          <clipPath id="trunkClip">
+
+              <use href="#trunkShape"/>
+
+          </clipPath>
+
+
+
+          <!-- Base Brown Color -->
+
+          <use href="#trunkShape" fill="#785E4D" />
+
+
+
+          <!-- Texture Overlay -->
+
+          <!-- mix-blend-mode works in web browsers, but basic SVG viewers might just show opacity -->
+
+          <rect width="600" height="1200" fill="url(#barkPattern)" opacity="0.2" style="mix-blend-mode: multiply;" />
+
+
+
+          <!-- Left Shadow Edge -->
+
+          <rect x="0" y="0" width="30" height="1200" fill="black" opacity="0.2" />
+
+          
+
+          <!-- Right Shadow Edge -->
+
+          <rect x="570" y="0" width="30" height="1200" fill="black" opacity="0.2" />
+
+      </g>
+
+      
+
+      <!-- Example Branch -->
+
+      <!-- Position logic matches CSS: top:100px, right:50% (x=50), width:100px, rotate:10deg -->
+
+      <rect x="50" y="100" width="100" height="15" rx="7.5" fill="#5C4033" transform="rotate(10, 100, 107.5)" />
+
+  </g>
+
+</svg>

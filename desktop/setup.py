@@ -12,18 +12,6 @@ socketio = SocketIO(cors_allowed_origins="*")
 
 
 def create_app():
-    """
-    Create and configure Flask application.
-    
-    This function:
-    1. Creates Flask app
-    2. Initializes SocketIO
-    3. Registers all features/routes
-    4. Sets up error handlers
-    
-    Returns:
-        Configured Flask application instance
-    """
     # 1. Create Flask app with shared template and static folders
     import os
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -46,25 +34,20 @@ def create_app():
 
 
 def register_features(app: Flask) -> None:
-    """
-    Register all feature blueprints with the app.
-    
-    Args:
-        app: Flask application instance
-    """
     from features.home import home_bp
     from features.my_robot import robot_bp
+    from features.learning import learning_bp
     
     # Register blueprints
     app.register_blueprint(home_bp)
     app.register_blueprint(robot_bp)
     
-    # TODO: Register more features as they are created
-    # from features.learning import learning_bp
+    from features.learning import learning_bp
+    app.register_blueprint(learning_bp)
     # from features.shop import shop_bp
     # from features.about import about_bp
     # from features.contact import contact_bp
-    # app.register_blueprint(learning_bp)
+
     # app.register_blueprint(shop_bp)
     # app.register_blueprint(about_bp)
     # app.register_blueprint(contact_bp)

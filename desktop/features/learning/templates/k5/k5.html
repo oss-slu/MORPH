@@ -1,0 +1,26 @@
+<div id="view-k5" class="view-section">
+    <div class="tree-page">
+        <div class="tree-background-k5" style="background-image: url('{{ url_for('static', filename='img/tree.svg') }}');"></div>
+        
+        <div class="leaves-container-k5">
+            <div id="caterpillar-indicator" class="caterpillar-indicator" data-current-lesson="1">
+                <img src="{{ url_for('static', filename='img/caterpillar.svg') }}" alt="Caterpillar" class="caterpillar-img">
+            </div>
+            
+            <button class="leaf-button-k5" style="left: 50%; bottom: 5%;" data-lesson="1" onclick="lessonModal.open(1)">
+                <img src="{{ url_for('static', filename='img/leaf.svg') }}" alt="Lesson 1" class="leaf-img-k5">
+                <span class="leaf-number">1</span>
+            </button>
+            
+            <button class="leaf-button-k5" style="left: 42%; bottom: 35%;" data-lesson="2" onclick="lessonModal.open(2)">
+                <img src="{{ url_for('static', filename='img/leaf.svg') }}" alt="Lesson 2" class="leaf-img-k5">
+                <span class="leaf-number">2</span>
+            </button>
+            
+            <button class="leaf-button-k5" style="left: 53%; bottom: 65%;" data-lesson="3" onclick="lessonModal.open(3)">
+                <img src="{{ url_for('static', filename='img/leaf.svg') }}" alt="Lesson 3" class="leaf-img-k5">
+                <span class="leaf-number">3</span>
+            </button>
+        </div>
+    </div>
+</div>

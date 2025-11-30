@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('learning.static', filename='css/learning.css') }}">
+<link rel="stylesheet" href="{{ url_for('learning.static', filename='css/k5/k5.css') }}">
+<script src="{{ url_for('learning.static', filename='js/learning.js') }}"></script>
+<script src="{{ url_for('learning.static', filename='js/lessons/K_5/lessons-data.js') }}"></script>
+<script src="{{ url_for('learning.static', filename='js/lessons/K_5/lesson-modal.js') }}"></script>
+<script src="{{ url_for('learning.static', filename='js/lessons/K_5/k5.js') }}"></script>
+
+<!-- Landing Page with 3 Buttons -->
+<div id="view-landing" class="view-section active">
+    <div class="landing-container">
+        <h2>MORPH Learn</h2>
+        <p class="subtitle">Choose your learning path</p>
+        <div class="buttons-container">
+            <button class="btn btn-primary" onclick="app.startPath('k5')">
+                <span>🌱</span> K-5
+            </button>
+            <button class="btn btn-primary" onclick="app.startPath('k6-12')">
+                <span>🏫</span> K6-12
+            </button>
+            <button class="btn btn-primary" onclick="app.startPath('uni')">
+                <span>🎓</span> UNI
+            </button>
+        </div>
+    </div>
+</div>
+
+{% include 'k5/k5.html' %}
+
+<!-- Lesson Modal - Persistent across pages -->
+<div id="lesson-modal" class="lesson-modal hidden">
+    <div class="lesson-modal-overlay"></div>
+    <div class="lesson-modal-content">
+        <button class="lesson-modal-close" onclick="lessonModal.close()">✕</button>
+        <div class="lesson-modal-body" id="lesson-modal-body">
+        </div>
+    </div>
+</div>
+
+<!-- K6-12 Learning View (placeholder) -->
+<div id="view-k6-12" class="view-section">
+    <div class="tree-page">
+        <div class="tree-background-k5" style="background-image: url('{{ url_for('static', filename='img/tree.svg') }}');"></div>
+        <p style="text-align: center; padding: 2rem; color: var(--text); position: relative; z-index: 10;">K6-12 content coming soon</p>
+    </div>
+</div>
+
+<!-- UNI Learning View (placeholder) -->
+<div id="view-uni" class="view-section">
+    <div class="tree-page">
+        <div class="tree-background-k5" style="background-image: url('{{ url_for('static', filename='img/tree.svg') }}');"></div>
+        <p style="text-align: center; padding: 2rem; color: var(--text); position: relative; z-index: 10;">UNI content coming soon</p>
+    </div>
+</div>
+
+{% endblock %}
