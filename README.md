@@ -1,6 +1,4 @@
 # **SMART: SLU Mobile Autonomous Robotics Toolkit**
-## A learning robot kit.
-
 ## Getting Started (ROS2 Jazzy)
 ### Clone the repository
 ```bash
@@ -44,5 +42,4 @@ Visit: http://127.0.0.1:5000/
 ```
 
 ## About
-- SMART/MORPH is an open-source electronics platform. By working with the OpenSource@SLU, we hope to bring modern robotics education access to the next generation of students.
-....
+SMART/MORPH is an open-source electronics platform. By working with the OpenSource@SLU, we hope to bring modern robotics education access to the next generation of students.
