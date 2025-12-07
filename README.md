@@ -11,8 +11,16 @@ cd SmartRobot
 ```bash
 git clone https://github.com/oss-slu/SmartRobot.git
 cd ros2_ws
-*TODO, add rosdep step?*
-colcon build
+rosdep install
+colcon build --symlink-install
+```
+
+### Running the full ROS2 launch
+To bring up the robot URDF/xacro in compatibility with the specific Waveshare servos/joints, use our custom Waveshare launch command. This will also launch a `ros2_control` differential drive model based on real life specs and joint descriptions, creating a twist-controller and estimate encoder odometry:
+```bash
+cd ros2_ws # if not already
+source install/setup.bash
+ros2 launch waveshare_servos example.launch.py
 ```
 
 ## Getting Started (Desktop client)
@@ -34,27 +42,7 @@ python app.py
 ```bash
 Visit: http://127.0.0.1:5000/
 ```
-## Support
-
-
-## Purchase
-- Please visit the following page to purchase our products:
-….
-- Business customers please contact us through the following email address:
-…
-
-
-## Copyright
-
 
 ## About
-- SMART is an open-source electronics platform.
-….
-- Our services include:
-….
-- Our code and circuit are open source. You can obtain the details and the latest information through visiting the following web site:
-
-
-## TODO
-- Link to our Wiki here, eventually refactor everything into wiki files
+- SMART/MORPH is an open-source electronics platform. By working with the OpenSource@SLU, we hope to bring modern robotics education access to the next generation of students.
 ....
