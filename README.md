@@ -4,7 +4,7 @@
 ## Quick Start (Desktop App Only)
 1. **Clone the repo and move into the desktop app**
    ```bash
-   git clone https://github.com/oss-slu/SmartRobot.git
+   git clone https://github.com/oss-slu/MORPH.git
    cd SmartRobot/desktop
    ```
 
