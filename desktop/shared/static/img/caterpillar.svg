@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 120" width="180" height="120">
+  <!-- Body Segments (Dark Forest Green) -->
+  <!-- Segment 1 (Head - Largest) -->
+  <ellipse cx="40" cy="60" rx="28" ry="22" fill="#2E7D32" opacity="0.95"/>
+  <ellipse cx="40" cy="60" rx="28" ry="22" fill="#1B5E20" opacity="0.3"/>
+  
+  <!-- Segment 2 -->
+  <ellipse cx="75" cy="62" rx="24" ry="20" fill="#2E7D32" opacity="0.95"/>
+  <ellipse cx="75" cy="62" rx="24" ry="20" fill="#1B5E20" opacity="0.3"/>
+  
+  <!-- Segment 3 -->
+  <ellipse cx="110" cy="64" rx="22" ry="18" fill="#2E7D32" opacity="0.95"/>
+  <ellipse cx="110" cy="64" rx="22" ry="18" fill="#1B5E20" opacity="0.3"/>
+  
+  <!-- Segment 4 (Tail - Smallest) -->
+  <ellipse cx="145" cy="66" rx="18" ry="14" fill="#2E7D32" opacity="0.95"/>
+  <ellipse cx="145" cy="66" rx="18" ry="14" fill="#1B5E20" opacity="0.3"/>
+  
+  <!-- Coral Pink Blush Marks -->
+  <circle cx="25" cy="58" r="4" fill="#FF6B9D" opacity="0.8"/>
+  <circle cx="55" cy="58" r="4" fill="#FF6B9D" opacity="0.8"/>
+  
+  <!-- Eyes -->
+  <circle cx="32" cy="55" r="3.5" fill="#000"/>
+  <circle cx="48" cy="55" r="3.5" fill="#000"/>
+  
+  <!-- Smile -->
+  <path d="M 30 63 Q 40 68 50 63" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Antennae -->
+  <path d="M 25 45 Q 20 30 15 20" stroke="#1B5E20" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 55 45 Q 60 30 65 20" stroke="#1B5E20" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <circle cx="15" cy="20" r="3" fill="#1B5E20"/>
+  <circle cx="65" cy="20" r="3" fill="#1B5E20"/>
+  
+  <!-- Texture/Grain Effect (Subtle) -->
+  <defs>
+    <pattern id="grain" patternUnits="userSpaceOnUse" width="4" height="4">
+      <circle cx="2" cy="2" r="0.5" fill="#1B5E20" opacity="0.1"/>
+    </pattern>
+  </defs>
+  <ellipse cx="40" cy="60" rx="28" ry="22" fill="url(#grain)"/>
+  <ellipse cx="75" cy="62" rx="24" ry="20" fill="url(#grain)"/>
+  <ellipse cx="110" cy="64" rx="22" ry="18" fill="url(#grain)"/>
+  <ellipse cx="145" cy="66" rx="18" ry="14" fill="url(#grain)"/>
+</svg>

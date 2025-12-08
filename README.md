@@ -1,45 +1,57 @@
-# **SMART: SLU Mobile Autonomous Robotics Toolkit**
-## Getting Started (ROS2 Jazzy)
-### Clone the repository
-```bash
-git clone https://github.com/oss-slu/SmartRobot.git
-cd SmartRobot
-```
-### Build the ROS2 components
-```bash
-git clone https://github.com/oss-slu/SmartRobot.git
-cd ros2_ws
-rosdep install
-colcon build --symlink-install
-```
+# **MORPH**
+## A learning robot kit.
 
-### Running the full ROS2 launch
-To bring up the robot URDF/xacro in compatibility with the specific Waveshare servos/joints, use our custom Waveshare launch command. This will also launch a `ros2_control` differential drive model based on real life specs and joint descriptions, creating a twist-controller and estimate encoder odometry:
-```bash
-cd ros2_ws # if not already
-source install/setup.bash
-ros2 launch waveshare_servos example.launch.py
-```
+## Quick Start (Desktop App Only)
+1. **Clone the repo and move into the desktop app**
+   ```bash
+   git clone https://github.com/oss-slu/SmartRobot.git
+   cd SmartRobot/desktop
+   ```
 
-## Getting Started (Desktop client)
-### Create and activate a virtual environment
-```bash
-python -m venv venv
-source venv/bin/activate   # macOS/Linux
-venv\Scripts\activate      # Windows
-```
-### Install dependencies
-```bash
-pip install -r requirements.txt
-```
-### Run the application
-```bash
-python app.py
-```
-### Open in browser
-```bash
-Visit: http://127.0.0.1:5000/
-```
+2. **Create and activate a Python virtual environment**
+   ```bash
+   python -m venv .venv
+   # macOS/Linux
+   source .venv/bin/activate
+   # Windows PowerShell
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+3. **Install the dependencies**
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+4. **Run the Socket.IO-enabled Flask server**
+   ```bash
+   python app.py
+   ```
+
+5. **Connect to your robot (optional)**
+   - In the dashboard’s “Connection” card, keep the default IP or type your robot’s IP.
+   - Click **Connect**. Once the status badge flips to “Connected” you can drive, monitor telemetry, and view logs.
+
+> ROS 2 builds are only needed if you plan to run the robot stack locally. For UI-only testing, the steps above are sufficient.
+
+## Support
+
+
+## Purchase
+- Please visit the following page to purchase our products:
+….
+- Business customers please contact us through the following email address:
+…
+
+
+## Copyright
+
 
 ## About
-SMART/MORPH is an open-source electronics platform. By working with the OpenSource@SLU, we hope to bring modern robotics education access to the next generation of students.
+- MORPH is an open-source robotics platform.
+….
+- Our services include:
+….
+- Our code and circuit are open source. You can obtain the details and the latest information through visiting the following web site:
+
+....
