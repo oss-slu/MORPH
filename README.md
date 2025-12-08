@@ -1,39 +1,39 @@
 # **MORPH**
 ## A learning robot kit.
 
-## Getting Started (ROS2 Jazzy)
-### Clone the repository
-```bash
-git clone https://github.com/oss-slu/SmartRobot.git
-cd SmartRobot
-```
-### Build the ROS2 components
-```bash
-git clone https://github.com/oss-slu/SmartRobot.git
-cd ros2_ws
-*TODO, add rosdep step?*
-colcon build
-```
+## Quick Start (Desktop App Only)
+1. **Clone the repo and move into the desktop app**
+   ```bash
+   git clone https://github.com/oss-slu/SmartRobot.git
+   cd SmartRobot/desktop
+   ```
 
-## Getting Started (Desktop client)
-### Create and activate a virtual environment
-```bash
-python -m venv venv
-source venv/bin/activate   # macOS/Linux
-venv\Scripts\activate      # Windows
-```
-### Install dependencies
-```bash
-pip install -r requirements.txt
-```
-### Run the application
-```bash
-python app.py
-```
-### Open in browser
-```bash
-Visit: http://127.0.0.1:5000/
-```
+2. **Create and activate a Python virtual environment**
+   ```bash
+   python -m venv .venv
+   # macOS/Linux
+   source .venv/bin/activate
+   # Windows PowerShell
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+3. **Install the dependencies**
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+4. **Run the Socket.IO-enabled Flask server**
+   ```bash
+   python app.py
+   ```
+
+5. **Connect to your robot (optional)**
+   - In the dashboard’s “Connection” card, keep the default IP or type your robot’s IP.
+   - Click **Connect**. Once the status badge flips to “Connected” you can drive, monitor telemetry, and view logs.
+
+> ROS 2 builds are only needed if you plan to run the robot stack locally. For UI-only testing, the steps above are sufficient.
+
 ## Support
 
 
@@ -48,7 +48,7 @@ Visit: http://127.0.0.1:5000/
 
 
 ## About
-- SMART is an open-source electronics platform.
+- MORPH is an open-source robotics platform.
 ….
 - Our services include:
 ….
