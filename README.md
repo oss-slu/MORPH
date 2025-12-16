@@ -5,7 +5,7 @@
 1. **Clone the repo and move into the desktop app**
    ```bash
    git clone https://github.com/oss-slu/MORPH.git
-   cd SmartRobot/desktop
+   cd MORPH/desktop
    ```
 
 2. **Create and activate a Python virtual environment**
