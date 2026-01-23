@@ -1,0 +1,23 @@
+services:
+  robot:
+    build:
+      context: robot
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 3
+  backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    depends_on:
+      - robot
+    ports:
+      - "8000:8000"
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - SERVER_URL=http://backend:8000
