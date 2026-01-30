@@ -8,4 +8,5 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 RUN apt-get update && apt install -y ros-$ROS_DISTRO-foxglove-bridge
 ENV PATH="/app/.venv/bin:$PATH"
 COPY . .
+RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]

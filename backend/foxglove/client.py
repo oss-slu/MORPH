@@ -4,6 +4,7 @@ import struct
 import traceback
 from socketio import AsyncClient, AsyncServer
 import websockets
+from websockets import ClientConnection, Subprotocol
 
 from config import COMMAND_CHANNEL_ID, TOPICS_TO_SUBSCRIBE
 from foxglove.constants import (
@@ -23,8 +24,7 @@ class FoxgloveClient:
         self._host = host
         self._port = port
         self._frontend_sock = frontend_sock
-        self._wsclient = AsyncClient()
-        self._ws = None
+        self._ws: ClientConnection | None = None
         self.command_channel_id = COMMAND_CHANNEL_ID
         self.subscribed_topics: dict[int, str] = {}
         self.command_channel_id = COMMAND_CHANNEL_ID
@@ -32,6 +32,10 @@ class FoxgloveClient:
         self.channel_info: dict[int, dict[str, str]] = (
             {}
         )  # channel_id → {topic, encoding, schemaName}
+
+    @property
+    def connected(self) -> bool:
+        return True
 
     async def _emit_log(self, message: str):
         await self._frontend_sock.emit("log", message)
@@ -41,19 +45,31 @@ class FoxgloveClient:
 
     async def connect(self):
         await self._emit_log(f"Connecting to Foxglove at {self._host}:{self._port}")
+
+        # If existing socket is dead, dispose of it.
+        if self._ws and self._ws.protocol.state != websockets.protocol.State.OPEN:
+            await self._ws.close()
+
         self._ws = await websockets.connect(
             uri=f"ws://{self._host}:{self._port}",
-            subprotocols=["foxglove.websocket.v1"],  # type: ignore
+            subprotocols=[Subprotocol("foxglove.sdk.v1")],
         )
+        msg = await self._ws.recv()
+        print(f"Received handshake: {msg}")
+
         if self._ws is None:
             await self._emit_log("Failed to connect to Foxglove WebSocket")
             raise RuntimeError("WebSocket connection failed")
 
         await self._emit_log("Connected to Foxglove WebSocket")
 
+        asyncio.create_task(self._advertise_command_channel())
+
+        # Start message handling loop
+        await self._handle_messages()
+
     async def _cleanup_connection(self) -> None:
         """Clean up WebSocket connection resources."""
-        self.running = False
         if self._ws:
             try:
                 await self._ws.close()
@@ -88,13 +104,13 @@ class FoxgloveClient:
         Processes both text (JSON control messages) and binary (ROS2 data) frames.
         Automatically subscribes to configured topics when they are advertised.
         """
-        if not self.connected or self._ws is None:
+        if not self._ws or not self.connected:
             await self._emit_log("⚠️ Cannot handle messages - not connected")
             return
 
         try:
             async for message in self._ws:
-                if not (self.running and self.connected and self._ws is not None):
+                if not self._ws or not self.connected:
                     break
 
                 try:
@@ -112,7 +128,6 @@ class FoxgloveClient:
         except Exception as e:
             await self._emit_log(f"⚠️ Message handling error: {e}")
             traceback.print_exc()
-            self.connected = False
 
     async def _handle_text_message(self, message: str) -> None:
         """
@@ -246,6 +261,10 @@ class FoxgloveClient:
             channel_id: Channel ID to subscribe to
             topic: Topic name for logging
         """
+        if not self.connected or self._ws is None:
+            await self._emit_log("⚠️ Not connected; cannot subscribe")
+            return
+
         try:
             subscription_id = len(self.subscribed_topics) + 1
             subscribe_msg = {
@@ -289,7 +308,7 @@ class FoxgloveClient:
             angular_z: Angular velocity around z axis (rad/s)
             frame_id: Reference frame ID
         """
-        if not (self.connected and self._ws):
+        if not self._ws or not self.connected:
             await self._emit_log("⚠️ Not connected; cannot send command")
             return
 

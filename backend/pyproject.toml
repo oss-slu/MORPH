@@ -7,6 +7,7 @@ requires-python = ">=3.14"
 dependencies = [
     "fastapi>=0.128.0",
     "foxglove-websocket>=0.1.4",
+    "pydantic>=2.12.5",
     "python-socketio>=5.16.0",
     "uvicorn>=0.40.0",
     "zeroconf>=0.148.0",

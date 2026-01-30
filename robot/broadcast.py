@@ -2,6 +2,7 @@ import random
 import socket
 import time
 from uuid import uuid4
+import os
 
 from zeroconf import ServiceInfo, Zeroconf
 import zeroconf
@@ -12,7 +13,7 @@ with open("wordlist.txt", "r") as f:
 robot_name = "MORPH-" + "-".join(random.sample(words, 3))
 service_type = "_robot._tcp.local."
 local_ip = socket.gethostbyname(socket.gethostname())
-port = 8080
+port = 8765
 
 info = ServiceInfo(
     type_=service_type,

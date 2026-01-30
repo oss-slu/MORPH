@@ -3,8 +3,8 @@ services:
     build:
       context: robot
       dockerfile: Dockerfile
-    deploy:
-      replicas: 3
+    ports:
+      - "8765:8765"
   backend:
     build:
       context: backend
@@ -13,6 +13,9 @@ services:
       - robot
     ports:
       - "8000:8000"
+    environment:
+      - RUNENV=docker
+      - PYTHONUNBUFFERED=1
   frontend:
     build:
       context: frontend
@@ -21,3 +24,4 @@ services:
       - "3000:3000"
     environment:
       - SERVER_URL=http://backend:8000
+      - VITE_SERVER_URL=http://localhost:8000
