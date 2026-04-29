@@ -20,7 +20,7 @@
 	/>
 </svelte:head>
 
-{#if robotConnection.status == "disconnected" || robotConnection.status == "idle"}
+{#if robotConnection.status !== "connected"}
 	<ConnectView />
 {:else}
 	<div class="w-full h-full min-h-0 flex flex-col flex-1">
