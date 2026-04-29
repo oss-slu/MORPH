@@ -12,14 +12,18 @@
 	let lidarPoints: THREE.BufferGeometry;
 	let poseMarker: THREE.Mesh | undefined;
 	let poseArrow: THREE.ArrowHelper | undefined;
+	let navigationCursorMarker: THREE.Mesh | undefined;
+	let navigationTargetMarker: THREE.Mesh | undefined;
+	let navigationArrow: THREE.ArrowHelper | undefined;
 	let robotPosition = $state({ x: 0, y: 0, z: 0 });
-	let dialogEl: HTMLDivElement | undefined = $state();
-	let navigationDialog = $state<{
-		screenX: number;
-		screenY: number;
-		worldX: number;
-		worldY: number;
-	} | null>(null);
+	let navigationMode = $state<"idle" | "select-target" | "select-heading">("idle");
+	let navigationTarget = $state<{ x: number; y: number } | null>(null);
+	let navigationHeading = $state<number | null>(null);
+	let navigationCursor = $state<{ x: number; y: number } | null>(null);
+
+	const NAV_ARROW_LENGTH = 0.9;
+	const NAV_ARROW_HEAD_LENGTH = 0.24;
+	const NAV_ARROW_HEAD_WIDTH = 0.14;
 
 	const pickRaycaster = new THREE.Raycaster();
 	const pickMouse = new THREE.Vector2();
@@ -28,27 +32,63 @@
 
 	let robotConnection = getRobotConnectionContext();
 
-	const dismissNavigationDialog = () => {
-		navigationDialog = null;
+	const startNavigation = () => {
+		navigationMode = "select-target";
+		navigationTarget = null;
+		navigationHeading = null;
+		navigationCursor = null;
 	};
 
-	const confirmNavigation = () => {
-		if (!navigationDialog) return;
-		console.log(
-			`Navigate to (${navigationDialog.worldX.toFixed(3)}, ${navigationDialog.worldY.toFixed(3)})`,
-		);
-		navigationDialog = null;
+	const cancelNavigation = () => {
+		navigationMode = "idle";
+		navigationTarget = null;
+		navigationHeading = null;
+		navigationCursor = null;
 	};
 
 	const onLidarPointerDown = (event: PointerEvent) => {
 		if (!container || !camera || event.button !== 0) return;
 
-		if (navigationDialog) {
-			const path = event.composedPath();
-			if (dialogEl && path.includes(dialogEl)) {
-				return;
-			}
-			navigationDialog = null;
+		if (navigationMode === "idle") return;
+
+		const bounds = container.getBoundingClientRect();
+		if (bounds.width === 0 || bounds.height === 0) return;
+
+		pickMouse.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+		pickMouse.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
+
+		pickRaycaster.setFromCamera(pickMouse, camera);
+		const intersection = pickRaycaster.ray.intersectPlane(mapPlane, mapHitPoint);
+		if (!intersection) return;
+
+		if (navigationMode === "select-target") {
+			navigationTarget = {
+				x: intersection.x,
+				y: intersection.y,
+			};
+			navigationMode = "select-heading";
+			return;
+		}
+
+		if (navigationMode === "select-heading" && navigationTarget) {
+			const heading = Math.atan2(
+				intersection.y - navigationTarget.y,
+				intersection.x - navigationTarget.x,
+			);
+			navigationHeading = heading;
+			console.log(
+				`Navigate to (${navigationTarget.x.toFixed(3)}, ${navigationTarget.y.toFixed(3)}) heading ${heading.toFixed(3)} rad`,
+			);
+			navigationMode = "idle";
+			navigationTarget = null;
+			return;
+		}
+	};
+
+	const onLidarPointerMove = (event: PointerEvent) => {
+		if (!container || !camera) return;
+		if (navigationMode === "idle") {
+			navigationCursor = null;
 			return;
 		}
 
@@ -62,11 +102,9 @@
 		const intersection = pickRaycaster.ray.intersectPlane(mapPlane, mapHitPoint);
 		if (!intersection) return;
 
-		navigationDialog = {
-			screenX: event.clientX - bounds.left,
-			screenY: event.clientY - bounds.top,
-			worldX: intersection.x,
-			worldY: intersection.y,
+		navigationCursor = {
+			x: intersection.x,
+			y: intersection.y,
 		};
 	};
 
@@ -102,6 +140,33 @@
 		);
 		scene.add(poseArrow);
 
+		const navigationMarkerGeometry = new THREE.SphereGeometry(0.12, 16, 16);
+		const navigationMarkerMaterial = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+		navigationCursorMarker = new THREE.Mesh(
+			navigationMarkerGeometry,
+			navigationMarkerMaterial,
+		);
+		navigationCursorMarker.visible = false;
+		scene.add(navigationCursorMarker);
+
+		navigationTargetMarker = new THREE.Mesh(
+			navigationMarkerGeometry,
+			navigationMarkerMaterial,
+		);
+		navigationTargetMarker.visible = false;
+		scene.add(navigationTargetMarker);
+
+		navigationArrow = new THREE.ArrowHelper(
+			new THREE.Vector3(1, 0, 0),
+			new THREE.Vector3(0, 0, 0),
+			NAV_ARROW_LENGTH,
+			0x10b981,
+			NAV_ARROW_HEAD_LENGTH,
+			NAV_ARROW_HEAD_WIDTH,
+		);
+		navigationArrow.visible = false;
+		scene.add(navigationArrow);
+
 		return () => {
 			if (renderer) {
 				renderer.dispose();
@@ -111,12 +176,66 @@
 					poseMarker.geometry.dispose();
 					(poseMarker.material as THREE.Material).dispose();
 				}
+				if (navigationCursorMarker) {
+					navigationCursorMarker.geometry.dispose();
+					(navigationCursorMarker.material as THREE.Material).dispose();
+				}
+				if (navigationTargetMarker) {
+					navigationTargetMarker.geometry.dispose();
+					(navigationTargetMarker.material as THREE.Material).dispose();
+				}
 				camera = undefined;
 				renderer = undefined;
 				poseMarker = undefined;
 				poseArrow = undefined;
+				navigationCursorMarker = undefined;
+				navigationTargetMarker = undefined;
+				navigationArrow = undefined;
 			}
 		}
+	});
+
+	const updateNavigationVisuals = () => {
+		if (!navigationCursorMarker || !navigationTargetMarker || !navigationArrow) return;
+
+		navigationCursorMarker.visible = false;
+		navigationTargetMarker.visible = false;
+		navigationArrow.visible = false;
+
+		if (navigationMode === "select-target" && navigationCursor) {
+			navigationCursorMarker.visible = true;
+			navigationCursorMarker.position.set(navigationCursor.x, navigationCursor.y, 0.05);
+			return;
+		}
+
+		if (navigationMode === "select-heading" && navigationTarget) {
+			navigationTargetMarker.visible = true;
+			navigationTargetMarker.position.set(navigationTarget.x, navigationTarget.y, 0.05);
+			if (navigationCursor) {
+				navigationCursorMarker.visible = true;
+				navigationCursorMarker.position.set(navigationCursor.x, navigationCursor.y, 0.05);
+
+				const direction = new THREE.Vector3(
+					navigationCursor.x - navigationTarget.x,
+					navigationCursor.y - navigationTarget.y,
+					0,
+				).normalize();
+				if (Number.isFinite(direction.x) && Number.isFinite(direction.y)) {
+					navigationArrow.visible = true;
+					navigationArrow.position.set(navigationTarget.x, navigationTarget.y, 0.05);
+					navigationArrow.setDirection(direction);
+					navigationArrow.setLength(
+						NAV_ARROW_LENGTH,
+						NAV_ARROW_HEAD_LENGTH,
+						NAV_ARROW_HEAD_WIDTH,
+					);
+				}
+			}
+		}
+	};
+
+	$effect(() => {
+		updateNavigationVisuals();
 	});
 
 	// Bind renderer to container.
@@ -234,9 +353,10 @@
 	role="application"
 	aria-label="Lidar view"
 	onpointerdown={onLidarPointerDown}
+	onpointermove={onLidarPointerMove}
 >
-	<div class="absolute top-8 left-8 pointer-events-none">
-		<div class="p-6 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
+	<div class="absolute top-8 left-8">
+		<div class="p-6 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl pointer-events-auto">
 			<div class="text-xs uppercase tracking-[0.16em] text-white/70">Robot Position</div>
 			<div class="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm text-white/90">
 				<span class="font-semibold">X</span>
@@ -244,35 +364,37 @@
 				<span class="font-semibold">Y</span>
 				<span>{robotPosition.y.toFixed(3)}</span>
 			</div>
+
+			<div class="mt-4 flex items-center gap-2">
+				<button
+					type="button"
+					class="px-4 py-2 rounded-xl text-sm font-semibold transition"
+					style:background="var(--accent)"
+					style:color="var(--page-bg)"
+					disabled={navigationMode !== "idle"}
+					onclick={startNavigation}
+				>
+					Navigate
+				</button>
+				{#if navigationMode !== "idle"}
+					<button
+						type="button"
+						class="px-3 py-2 rounded-xl border border-white/25 bg-white/10 text-white/90 hover:bg-white/20 transition"
+						onclick={cancelNavigation}
+					>
+						Cancel
+					</button>
+				{/if}
+			</div>
+
+			{#if navigationMode === "select-target"}
+				<p class="mt-3 text-xs text-white/75">Click a target position in the map.</p>
+			{:else if navigationMode === "select-heading" && navigationTarget}
+				<p class="mt-3 text-xs text-white/75">
+					Now click the direction the robot should face.
+				</p>
+			{/if}
 		</div>
 	</div>
 
-	{#if navigationDialog}
-		<div
-			bind:this={dialogEl}
-			class="absolute z-20 w-70 p-4 rounded-2xl bg-white/12 backdrop-blur-md border border-white/20 shadow-2xl text-white"
-			style:left={`${navigationDialog.screenX}px`}
-			style:top={`${navigationDialog.screenY}px`}
-		>
-			<p class="text-sm leading-6">
-				Navigate to ({navigationDialog.worldX.toFixed(2)}, {navigationDialog.worldY.toFixed(2)})?
-			</p>
-			<div class="mt-3 flex gap-2 justify-end">
-				<button
-					type="button"
-					class="px-3 py-2 rounded-xl border border-white/25 bg-white/10 text-white/90 hover:bg-white/20 transition"
-					onclick={dismissNavigationDialog}
-				>
-					No
-				</button>
-				<button
-					type="button"
-					class="px-3 py-2 rounded-xl border border-emerald-300/40 bg-emerald-400/20 text-emerald-100 hover:bg-emerald-400/30 transition"
-					onclick={confirmNavigation}
-				>
-					Yes
-				</button>
-			</div>
-		</div>
-	{/if}
 </div>
